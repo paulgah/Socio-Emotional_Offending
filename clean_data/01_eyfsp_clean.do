@@ -1,6 +1,6 @@
 ********************************************************************************
-* Project : Socio-Emotional Characteristics in Early Childhood and
-*           Offending Behaviour in Adolescence
+* Project : Early Socio-Emotional Skills and Adolescent Offending: 
+*           Evidence from Administrative Data
 * Author  : Paul Garcia
 * Institute: Institute for Social and Economic Research (ISER), University of Essex
 * Fellowship: ADR UK (ESRC) Research Fellowship

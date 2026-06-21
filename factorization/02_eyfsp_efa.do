@@ -1,11 +1,11 @@
 ********************************************************************************
-* Project : Socio-Emotional Characteristics in Early Childhood and
-*           Offending Behaviour in Adolescence
+* Project : Early Socio-Emotional Skills and Adolescent Offending: 
+*           Evidence from Administrative Data
 * Author  : Paul Garcia
 * Institute: Institute for Social and Economic Research (ISER), University of Essex
 * Fellowship: ADR UK (ESRC) Research Fellowship
 *
-* File    : 03_eyfsp_efa.do
+* File    : 02_eyfsp_efa.do
 * Purpose : Exploratory Factor Analysis (EFA) of EYFSP binary items using
 *           tetrachoric correlations.  Two parallel EFA streams are run:
 *

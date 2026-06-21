@@ -1,11 +1,11 @@
 ********************************************************************************
-* Project : Socio-Emotional Characteristics in Early Childhood and
-*           Offending Behaviour in Adolescence
+* Project : Early Socio-Emotional Skills and Adolescent Offending: 
+*           Evidence from Administrative Data
 * Author  : Paul Garcia
 * Institute: Institute for Social and Economic Research (ISER), University of Essex
 * Fellowship: ADR UK (ESRC) Research Fellowship
 *
-* File    : 04_regressions.do
+* File    : 03_regressions.do
 * Purpose : Main regression analysis linking EYFSP cognitive (cogn_esem) and
 *           socio-emotional (semo_esem) factor scores to school-age outcomes
 *           and adolescent offending.
@@ -142,7 +142,7 @@ foreach var of varlist *bfs *esem {
 *------------------------------------------------------------------------------
 summ ks2_testmark_gps ks2_testmark_read ks2_testmark_math
 
-foreach var of varlist *diff school_diff_alt ks1_score                    ///
+foreach var of varlist *diff absences_score ks1_score                    ///
                         ks2_testmark_gps ks2_testmark_read                ///
                         ks2_testmark_math ks2_score_ta {
     summ `var'
@@ -176,7 +176,7 @@ global census 1.female nsiblings 1.first_born 1.nowhite 1.fsm            ///
               1.part_time 1.sen_prior 1.cin_prior
 
 summ offending *score *diff *fs *esem
-summ sen cin school_diff_alt ks2_score offending
+summ sen cin absences_score ks2_score offending
 
 
 ********************************************************************************
@@ -267,13 +267,13 @@ reghdfe cla semo_esem cogn_esem $census_cin if cin == 1 & cin_prior == 0,  ///
 ********************************************************************************
 * SECTION 4 — SCHOOL DIFFICULTIES (TRANSITIONS AND ABSENCES)
 ********************************************************************************
-summ *esem school_diff_alt share_absences persistent_absent
+summ *esem absences_score share_absences persistent_absent
 
 * School transitions
-reghdfe school_diff_alt semo_esem cogn_esem $census,                      ///
+reghdfe absences_score semo_esem cogn_esem $census,                      ///
     absorb(LA_KS2) vce(cluster school_KS2)
 
-reghdfe school_diff_alt semo_esem cogn_esem $census,                      ///
+reghdfe absences_score semo_esem cogn_esem $census,                      ///
     absorb(school_KS2) vce(cluster school_KS2)
 
 
@@ -334,9 +334,9 @@ reghdfe ks2_level4_alt semo_esem cogn_esem $census,                       ///
     absorb(school_KS2) vce(cluster school_KS2)
 
 * Adding school difficulties and exclusion as mediators
-reghdfe ks2_score school_diff_alt excluded semo_esem cogn_esem $census,   ///
+reghdfe ks2_score absences_score excluded semo_esem cogn_esem $census,   ///
     absorb(school_KS2) vce(cluster school_KS2)
-reghdfe ks2_score school_diff_alt excluded semo_esem cogn_esem            ///
+reghdfe ks2_score absences_score excluded semo_esem cogn_esem            ///
     sen cin $census,                                                       ///
     absorb(school_KS2) vce(cluster school_KS2)
 
@@ -351,7 +351,7 @@ reghdfe ks2_score school_diff_alt excluded semo_esem cogn_esem            ///
 * Interaction models test heterogeneity by SEN and CIN status.
 ********************************************************************************
 
-summ *esem offending school_diff_alt ks2_score
+summ *esem offending absences_score ks2_score
 
 * Base logit with LA FE
 logit offending semo_esem cogn_esem $census i.LA_KS2,                     ///
@@ -363,38 +363,38 @@ clogit offending semo_esem cogn_esem $census,                             ///
     or group(school_KS2) vce(cluster school_KS2)
 
 * Adding school difficulties and exclusions
-logit offending semo_esem cogn_esem school_diff_alt excluded $census      ///
+logit offending semo_esem cogn_esem absences_score excluded $census      ///
     i.LA_KS2, vce(cluster school_KS2)
-margins, dydx(semo_esem cogn_esem school_diff_alt excluded                ///
+margins, dydx(semo_esem cogn_esem absences_score excluded                ///
               1.female 1.nowhite 1.fsm) post
 
 * Adding KS2 score (full mediation chain)
-logit offending semo_esem cogn_esem school_diff_alt excluded              ///
+logit offending semo_esem cogn_esem absences_score excluded              ///
     ks2_score $census i.LA_KS2,                                           ///
     or vce(cluster school_KS2)
-margins, dydx(semo_esem cogn_esem school_diff_alt excluded ks2_score      ///
+margins, dydx(semo_esem cogn_esem absences_score excluded ks2_score      ///
               1.female 1.nowhite 1.fsm) post
 
 * Adding SEN and CIN indicators
-logit offending ks2_score school_diff_alt excluded                        ///
+logit offending ks2_score absences_score excluded                        ///
     semo_esem cogn_esem sen cin $census i.LA_KS2,                         ///
     or vce(cluster school_KS2)
 
 * Interaction model: heterogeneity by SEN and CIN status
-logit offending ks2_score excluded school_diff_alt semo_esem cogn_esem   ///
+logit offending ks2_score excluded absences_score semo_esem cogn_esem   ///
     c.cogn_esem#i.sen c.semo_esem#i.sen                                   ///
     c.cogn_esem#i.cin c.semo_esem#i.cin                                   ///
     i.sen i.cin $census i.LA_KS2,                                         ///
     or vce(cluster school_KS2)
 
 * Marginal effects at sen = 0, cin = 0
-margins, dydx(ks2_score excluded school_diff_alt semo_esem cogn_esem      ///
+margins, dydx(ks2_score excluded absences_score semo_esem cogn_esem      ///
               1.sen 1.cin 1.female nsiblings 1.first_born                 ///
               1.nowhite 1.fsm ib10.imd_decile)                            ///
     at(sen = 0 cin = 0) post
 
 * Marginal effects at sen = 1, cin = 1
-margins, dydx(ks2_score excluded school_diff_alt semo_esem cogn_esem      ///
+margins, dydx(ks2_score excluded absences_score semo_esem cogn_esem      ///
               i.sen i.cin 1.female nsiblings 1.first_born                 ///
               1.nowhite 1.fsm ib10.imd_decile)                            ///
     at(sen = 1 cin = 1) post
@@ -404,7 +404,7 @@ bys school_KS2: egen max_offending = max(offending)
 tab max_offending
 summ offending if max_offending == 1
 
-clogit offending ks2_score excluded school_diff_alt semo_esem cogn_esem  ///
+clogit offending ks2_score excluded absences_score semo_esem cogn_esem  ///
     c.cogn_esem#1.sen c.semo_esem#1.sen                                   ///
     c.cogn_esem#1.cin c.semo_esem#1.cin                                   ///
     1.sen 1.cin $census,                                                   ///
@@ -421,14 +421,14 @@ clogit offending ks2_score excluded school_diff_alt semo_esem cogn_esem  ///
 * Count model uses negative binomial regression (num_offences_cens).
 ********************************************************************************
 
-summ *esem school_diff_alt ks2_score excluded if offending == 1
+summ *esem absences_score ks2_score excluded if offending == 1
 summ violent_offence drugs_offence property_offence summary_offence
 
 *--- Violent offences --------------------------------------------------------
 logit violent_offence semo_esem cogn_esem $census i.LA_KS2                ///
     if offending == 1, vce(cluster school_KS2)
 
-logit violent_offence ks2_score school_diff_alt excluded                  ///
+logit violent_offence ks2_score absences_score excluded                  ///
     semo_esem cogn_esem $census i.LA_KS2                                  ///
     if offending == 1, vce(cluster school_KS2)
 
@@ -440,15 +440,15 @@ nbreg num_offences_cens semo_esem cogn_esem $census i.LA_KS2              ///
 margins, dydx(*esem 1.female nsiblings 1.first_born                       ///
               1.nowhite 1.fsm ib10.imd_decile) post
 
-nbreg num_offences_cens ks2_score school_diff_alt excluded                ///
+nbreg num_offences_cens ks2_score absences_score excluded                ///
     semo_esem cogn_esem $census i.LA_KS2                                  ///
     if offending == 1, vce(cluster school_KS2)
-margins, dydx(ks2_score school_diff_alt excluded *esem                    ///
+margins, dydx(ks2_score absences_score excluded *esem                    ///
               1.female nsiblings 1.first_born                             ///
               1.nowhite 1.fsm ib10.imd_decile) post
 
 *--- Non-violent offences (exclude violent offenders) ------------------------
-summ *esem school_diff_alt ks2_score if offending == 1 & violent_offence == 0
+summ *esem absences_score ks2_score if offending == 1 & violent_offence == 0
 summ drugs_offence property_offence summary_offence                       ///
     if offending == 1 & violent_offence == 0
 
@@ -456,7 +456,7 @@ summ drugs_offence property_offence summary_offence                       ///
 logit drugs_offence semo_esem cogn_esem $census i.LA_KS2                  ///
     if offending == 1 & violent_offence == 0, vce(cluster school_KS2)
 
-logit drugs_offence ks2_score school_diff_alt excluded                    ///
+logit drugs_offence ks2_score absences_score excluded                    ///
     semo_esem cogn_esem $census i.LA_KS2                                  ///
     if offending == 1 & violent_offence == 0, vce(cluster school_KS2)
 
@@ -464,7 +464,7 @@ logit drugs_offence ks2_score school_diff_alt excluded                    ///
 logit property_offence semo_esem cogn_esem $census i.LA_KS2               ///
     if offending == 1 & violent_offence == 0, vce(cluster school_KS2)
 
-logit property_offence ks2_score school_diff_alt excluded                 ///
+logit property_offence ks2_score absences_score excluded                 ///
     semo_esem cogn_esem $census i.LA_KS2                                  ///
     if offending == 1 & violent_offence == 0, vce(cluster school_KS2)
 
@@ -472,7 +472,7 @@ logit property_offence ks2_score school_diff_alt excluded                 ///
 logit summary_offence semo_esem cogn_esem $census i.LA_KS2                ///
     if offending == 1 & violent_offence == 0, vce(cluster school_KS2)
 
-logit summary_offence ks2_score school_diff_alt excluded                  ///
+logit summary_offence ks2_score absences_score excluded                  ///
     semo_esem cogn_esem $census i.LA_KS2                                  ///
     if offending == 1 & violent_offence == 0, vce(cluster school_KS2)
 
@@ -487,7 +487,7 @@ logit summary_offence ks2_score school_diff_alt excluded                  ///
 * subsample.
 ********************************************************************************
 
-summ *esem school_diff_alt ks2_score excluded offending if sample_siblings == 1
+summ *esem absences_score ks2_score excluded offending if sample_siblings == 1
 
 * Full sibling sample: include female indicator
 global census_siblings nsiblings 1.first_born i.ybirth i.mbirth                    ///
@@ -505,7 +505,7 @@ reghdfe offending semo_esem cogn_esem $census_siblings ///
     if sample_siblings == 1 & female == 0,                                ///
     absorb(groupid_sib) vce(cluster groupid_sib)
 
-reghdfe offending ks2_score school_diff_alt excluded semo_esem cogn_esem  ///
+reghdfe offending ks2_score absences_score excluded semo_esem cogn_esem  ///
     $census_siblings if sample_siblings == 1 & female == 0,                        ///
     absorb(groupid_sib) vce(cluster groupid_sib)
 
@@ -515,7 +515,7 @@ reghdfe offending ks2_score school_diff_alt excluded semo_esem cogn_esem  ///
 * Uses bifactor factor scores (gend_bfs, cogn_bfs, semo_bfs) as alternative
 * measurement specification.  School FE via conditional logit throughout.
 ********************************************************************************
-summ *bfs school_diff_alt ks2_score
+summ *bfs absences_score ks2_score
 
 clogit offending gend_bfs $census,                                        ///
     or group(school_KS2) vce(cluster school_KS2)
@@ -523,14 +523,14 @@ clogit offending gend_bfs $census,                                        ///
 clogit offending *bfs $census,                                            ///
     or group(school_KS2) vce(cluster school_KS2)
 
-clogit offending ks2_score school_diff_alt excluded *bfs $census,         ///
+clogit offending ks2_score absences_score excluded *bfs $census,         ///
     or group(school_KS2) vce(cluster school_KS2)
 
-clogit offending ks2_score school_diff_alt excluded *bfs sen cin $census, ///
+clogit offending ks2_score absences_score excluded *bfs sen cin $census, ///
     or group(school_KS2) vce(cluster school_KS2)
 
 * Interaction model: heterogeneity by SEN and CIN
-clogit offending ks2_score school_diff_alt excluded *bfs                  ///
+clogit offending ks2_score absences_score excluded *bfs                  ///
     (c.gend_bfs c.cogn_bfs c.semo_bfs)#1.sen                             ///
     (c.gend_bfs c.cogn_bfs c.semo_bfs)#1.cin                             ///
     1.sen 1.cin $census,                                                   ///
@@ -556,26 +556,26 @@ reghdfe excluded semo_esem cogn_esem $census                              ///
     [pw = ipw], absorb(school_KS2) vce(cluster school_KS2)
 
 *--- School difficulties -----------------------------------------------------
-reghdfe school_diff_alt semo_esem cogn_esem $census                       ///
+reghdfe absences_score semo_esem cogn_esem $census                       ///
     if ipw != ., absorb(school_KS2) vce(cluster school_KS2)
-reghdfe school_diff_alt semo_esem cogn_esem $census                       ///
+reghdfe absences_score semo_esem cogn_esem $census                       ///
     [pw = ipw], absorb(school_KS2) vce(cluster school_KS2)
 
 *--- KS2 attainment ----------------------------------------------------------
-reghdfe ks2_score school_diff_alt excluded semo_esem cogn_esem $census    ///
+reghdfe ks2_score absences_score excluded semo_esem cogn_esem $census    ///
     if ipw != ., absorb(school_KS2) vce(cluster school_KS2)
-reghdfe ks2_score school_diff_alt excluded semo_esem cogn_esem $census    ///
+reghdfe ks2_score absences_score excluded semo_esem cogn_esem $census    ///
     [pw = ipw], absorb(school_KS2) vce(cluster school_KS2)
 
 *--- Offending ---------------------------------------------------------------
-logit offending ks2_score school_diff_alt excluded semo_esem cogn_esem    ///
+logit offending ks2_score absences_score excluded semo_esem cogn_esem    ///
     $census i.LA_KS2                                                       ///
     if ipw != ., or vce(cluster school_KS2)
 
-logit offending ks2_score school_diff_alt excluded semo_esem cogn_esem    ///
+logit offending ks2_score absences_score excluded semo_esem cogn_esem    ///
     $census i.LA_KS2                                                       ///
     [pw = ipw], or vce(cluster school_KS2)
-margins, dydx(ks2_score school_diff_alt excluded semo_esem cogn_esem      ///
+margins, dydx(ks2_score absences_score excluded semo_esem cogn_esem      ///
               1.female nsiblings 1.first_born                             ///
               1.nowhite 1.fsm ib10.imd_decile) post
 
